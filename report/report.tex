@@ -6,6 +6,9 @@
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{biblatex}
+\addbibresource{egbib.bib}
+
 
 % Include other packages here, before hyperref.
 
@@ -21,7 +24,7 @@
 
 % Pages are numbered in submission mode, and unnumbered in camera-ready
 %\ifcvprfinal\pagestyle{empty}\fi
-\setcounter{page}{4321}
+\setcounter{page}{1}
 \begin{document}
 
 %%%%%%%%% TITLE
@@ -56,7 +59,7 @@ Pierpaolo D'Odorico\\
 %%%%%%%%% BODY TEXT
 \section{Introduction}
 
-The faced problem is the speech recognition challenge, where the goal is to build a system that can automatically recognize spoken words. In particular, the spoken words are given as input in form of audio recordings of one second length, while the output of the system is the text of the recognized words. All the records are waveform of one of the following 8 words:
+The faced problem is the speech recognition challenge, where the goal is to build a system that can automatically recognize spoken words. In particular, the spoken words are given as input in form of audio recordings of one second length, while the output of the system is the text of the recognized words. All the recordings are waveform of one of the following 8 words:
 \begin{itemize}
 	\itemsep-0.3em 
 	\item Down;
@@ -72,13 +75,81 @@ This task is a key component in many artificial intelligence services, such as v
 Our work begin after the features extraction provided us by the professors, in form of log mel-spectrogram, that is a bi-dimensional representation of the recordings, involving frequency and time. After that, the images of the spectrograms are first resized and than reshaped in 1024-dimensional vectors.\\
 We have faced the problem by applying several machine learning methods, from the easier ones to the more complicated ones, and choosing the best performing method based on accuracy. This led us to a system capable of classifying spoken words with an accuracy of more that 95\%. 
 
-\subsection{Language}
+\section{Dataset}
 
-All manuscripts must be in English.
+The used dataset is a reduced version of TensorFlow Speech Commands Dataset v0.0.1 \cite{tensorflow2015-whitepaper}. The data provided us is alredy divided in training and validation set. The training set is composed of 1600 samples, 200 for each of the 8 classes, and the validation set is composed of 109 samples.
+Every recording has a sampling frequency of 16 kHz. The hop length used for constructing the log Mel-spectrogram is 512, while it is not specified the window size. The feature extraction mimics the humany auditory system, providing a representation of the audio taking into account the fact that humans perceve both the frequencies and the amplitude of the sound logarithmically. The whole preocess of extracting the features for each recording can be summarized in:
+\begin{itemize}
+	\itemsep0em 
+	\item \textbf{Create the windows}, by sampling the recording and making hops of size 512;
+	\item \textbf{Compute the discrete Fuorier transform} for each window, using the fast Fourier transform algorithm;
+	\item \textbf{Convert to the Mel scale}: changing the representation from of the frequencies from Hz to the Mel scale (the scale of pitches judged by listeners to be equal in distance one from another, a kind of human perceving frequency scale);
+	\item \textbf{Create the features}, by computing the log Mel-spectrogram (that is an image), resizing and reshaping it to a 1024 dimensional vector.
+\end{itemize}
+The dataset provided us alredy contains the extracted features and the correct class of the samples. The dataset doesn't have unbalanced classes problem.
 
-\subsection{Suggested Structure}
+\section{Method}
+The methods used in this project are machine learning tecniques that are well suited for multiclass classification tasks. We tried the performance of various methods under different configurations, starting from the basic models and ending with the more complicated ones. Many models we tried are based on binary classification, the way we used such models are using the one-vs-all strategy, i. e. training one binary classifier per class and than predict the instances by loocking at the classifier that maximizes the confidence score.
+\subsection{List of used methods}
+Every method can be tuned by changing some hyperparameters. In the following table we reported the tecniques, which of those hyperparameters we taked into account for selecting the best configuration, and how that method handle multiclass classification.
+The tecniques we tried are:
+\begin{table}
+	\begin{center}
+		\resizebox{\columnwidth}{!}{
+		\begin{tabular}{|c|c|c|}
+			\hline
+			Method & Hyperparameters & handling \\
+			\hline\hline
+			
+			
+			
+			Linear Classification & C : Regularization & One-vs-all \\
+			
+			\hline
+			Logistic Regression & C : Regularization & One-vs-all \\
+			
+			\hline
+			K-Neighbors Classifier  & K : number of neighbors & Majority vote of  \\
+			&& the K-neighbors \\
+			
+			\hline
+			Classification tree & Max depth; & Naturally handle multiclass \\
+			&Min samples leaf;&\\
+			&Min impurity decrease&\\
+			
+			\hline
+			Random forest & Number of trees & Naturally handle multiclass \\
+			
+			\hline
+			Support Vector Machine & C : Regularization; & One-vs-all \\
+			&Type of kernel&\\
+			
+			\hline
+			Neural network &  & Softmax activation \\
+			&&on the output layer\\ 
+			
+			\hline
+		\end{tabular}}
+	\end{center}
+	\caption{Results. Ours is better.}
+	\label{mytable}
+\end{table}
 
-The following is a suggested structure for your report:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 \begin{itemize}
 	\item Introduction (20\%): describe the problem you are working on, why it's important, what are your goals, and provide also an overview of your main results.
@@ -226,10 +297,11 @@ the line width as in the example below
 \end{verbatim}
 }
 
+%{\small
+%\bibliographystyle{ieee_fullname}
+%\bibliography{egbib}
+%}
 
-{\small
-\bibliographystyle{ieee_fullname}
-\bibliography{egbib}
-}
+\printbibliography
 
 \end{document}
